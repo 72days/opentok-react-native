@@ -102,6 +102,8 @@ class OTSessionManager: RCTEventEmitter {
             publisher.publishAudio = Utils.sanitizeBooleanProperty(properties["publishAudio"] as Any);
             publisher.publishVideo = Utils.sanitizeBooleanProperty(properties["publishVideo"] as Any);
             publisher.audioLevelDelegate = self;
+            publisher.rtcStatsReportDelegate = self;
+
             callback([NSNull()]);
         }
     }
@@ -309,7 +311,12 @@ class OTSessionManager: RCTEventEmitter {
         sessionInfo["connectionStatus"] = session.sessionConnectionStatus.rawValue;
         callback([sessionInfo]);
     }
-    
+
+    @objc func getPublisherRtcStatsReport(_ publisherId: String) -> Void {
+        guard let publisher = OTRN.sharedState.publishers[publisherId] else { return }
+        publisher.getRtcStatsReport();
+    }
+
     @objc func enableLogs(_ logLevel: Bool) -> Void {
         self.logLevel = logLevel;
     }
@@ -545,6 +552,16 @@ extension OTSessionManager: OTSubscriberDelegate {
         subscriberInfo["stream"] = EventUtils.prepareJSStreamEventData(stream);
         self.emitEvent("\(EventUtils.subscriberPreface)didFailWithError", data: subscriberInfo)
         printLogs("OTRN: Subscriber failed: \(error.localizedDescription)")
+    }
+}
+
+extension OTSessionManager: OTPublisherKitRtcStatsReportDelegate {
+    func publisher(_ publisher: OTPublisherKit, rtcStatsReport: Array<OTPublisherRtcStats>) {
+        let publisherId = Utils.getPublisherId(publisher as! OTPublisher);
+        if (publisherId.count > 0) {
+            let rtcStatsReportData: Dictionary<String, Any> = EventUtils.prepareJSPublisherRTCStatsReport(rtcStatsReport);
+            self.emitEvent("\(publisherId):\(EventUtils.publisherPreface)rtcStatsReportUpdated", data: rtcStatsReportData);
+        }
     }
 }
 

@@ -80,8 +80,53 @@ class EventUtils {
         return sessionInfo;
     }
     
+    static func prepareJSPublisherRTCStatsReport(_ rtcStatsReport: Array<OTPublisherRtcStats>) -> Dictionary<String, Any> {
+        var rtcStatsReportData: Dictionary<String, Any> = [:];
+        var reports = [Dictionary<String, Any>]()
+        for rtcStatsReportItem in rtcStatsReport {
+            var jsDataItem: Dictionary<String, Any> = [:];
+            jsDataItem["connectionId"] = rtcStatsReportItem.connectionId
+            jsDataItem["jsonArrayOfReports"] = rtcStatsReportItem.jsonArrayOfReports
+            reports.append(jsDataItem)
+        }
+        rtcStatsReportData["data"] = reports
+        return rtcStatsReportData;
+    }
+    
     static func getSupportedEvents() -> [String] {
-        return ["\(sessionPreface)streamCreated", "\(sessionPreface)streamDestroyed", "\(sessionPreface)sessionDidConnect", "\(sessionPreface)sessionDidDisconnect", "\(sessionPreface)connectionCreated", "\(sessionPreface)connectionDestroyed", "\(sessionPreface)didFailWithError", "\(publisherPreface)streamCreated", "\(sessionPreface)signal", "\(publisherPreface)streamDestroyed", "\(publisherPreface)didFailWithError", "\(publisherPreface)audioLevelUpdated", "\(subscriberPreface)subscriberDidConnect", "\(subscriberPreface)subscriberDidDisconnect", "\(subscriberPreface)didFailWithError", "\(subscriberPreface)videoNetworkStatsUpdated", "\(subscriberPreface)audioNetworkStatsUpdated", "\(subscriberPreface)audioLevelUpdated", "\(subscriberPreface)subscriberVideoEnabled", "\(subscriberPreface)subscriberVideoDisabled", "\(subscriberPreface)subscriberVideoDisableWarning", "\(subscriberPreface)subscriberVideoDisableWarningLifted", "\(subscriberPreface)subscriberVideoDataReceived", "\(sessionPreface)archiveStartedWithId", "\(sessionPreface)archiveStoppedWithId", "\(sessionPreface)sessionDidBeginReconnecting", "\(sessionPreface)sessionDidReconnect", "\(sessionPreface)streamPropertyChanged", "\(subscriberPreface)subscriberDidReconnect"];
+        return [
+            "\(sessionPreface)streamCreated",
+            "\(sessionPreface)streamDestroyed",
+            "\(sessionPreface)sessionDidConnect",
+            "\(sessionPreface)sessionDidDisconnect",
+            "\(sessionPreface)connectionCreated",
+            "\(sessionPreface)connectionDestroyed",
+            "\(sessionPreface)didFailWithError", 
+            "\(sessionPreface)signal",
+            "\(sessionPreface)archiveStartedWithId",
+            "\(sessionPreface)archiveStoppedWithId",
+            "\(sessionPreface)sessionDidBeginReconnecting",
+            "\(sessionPreface)sessionDidReconnect",
+            "\(sessionPreface)streamPropertyChanged",
+
+            "\(publisherPreface)streamCreated",
+            "\(publisherPreface)streamDestroyed",
+            "\(publisherPreface)didFailWithError",
+            "\(publisherPreface)audioLevelUpdated",
+            "\(publisherPreface)rtcStatsReportUpdated",
+
+            "\(subscriberPreface)subscriberDidConnect",
+            "\(subscriberPreface)subscriberDidDisconnect",
+            "\(subscriberPreface)didFailWithError",
+            "\(subscriberPreface)videoNetworkStatsUpdated",
+            "\(subscriberPreface)audioNetworkStatsUpdated",
+            "\(subscriberPreface)audioLevelUpdated",
+            "\(subscriberPreface)subscriberVideoEnabled",
+            "\(subscriberPreface)subscriberVideoDisabled",
+            "\(subscriberPreface)subscriberVideoDisableWarning",
+            "\(subscriberPreface)subscriberVideoDisableWarningLifted",
+            "\(subscriberPreface)subscriberVideoDataReceived",
+            "\(subscriberPreface)subscriberDidReconnect"];
     }
     
     static func convertDateToString(_ creationTime: Date) -> String {

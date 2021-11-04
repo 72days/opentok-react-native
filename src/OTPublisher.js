@@ -149,6 +149,9 @@ class OTPublisher extends Component {
       }
     );
   }
+  getRtcStatsReport = () => {
+    OT.getPublisherRtcStatsReport(this.state.publisherId)
+  }
   render() {
     const { publisher, publisherId } = this.state;
     const { sessionId } = this.context;
