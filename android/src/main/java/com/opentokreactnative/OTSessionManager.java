@@ -46,6 +46,7 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         implements Session.SessionListener,
         PublisherKit.PublisherListener,
         PublisherKit.AudioLevelListener,
+        PublisherKit.PublisherRtcStatsReportListener,
         SubscriberKit.SubscriberListener,
         Session.SignalListener,
         Session.ConnectionListener,
@@ -183,6 +184,7 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         }
         mPublisher.setPublisherListener(this);
         mPublisher.setAudioLevelListener(this);
+        mPublisher.setRtcStatsReportListener(this);
         mPublisher.setAudioFallbackEnabled(audioFallbackEnabled);
         mPublisher.setPublishVideo(publishVideo);
         mPublisher.setPublishAudio(publishAudio);
@@ -362,6 +364,15 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         Publisher mPublisher = mPublishers.get(publisherId);
         if (mPublisher != null) {
             mPublisher.cycleCamera();
+        }
+    }
+
+    @ReactMethod
+    public void getPublisherRtcStatsReport(String publisherId) {
+        ConcurrentHashMap<String, Publisher> mPublishers = sharedState.getPublishers();
+        Publisher mPublisher = mPublishers.get(publisherId);
+        if (mPublisher != null) {
+            mPublisher.getRtcStatsReport();
         }
     }
 
@@ -693,6 +704,15 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         if (publisherId.length() > 0) {
             String event = publisherId + ":" + publisherPreface + "onAudioLevelUpdated";
             sendEventWithString(this.getReactApplicationContext(), event, String.valueOf(audioLevel));
+        }
+    }
+
+    @Override
+    public void onRtcStatsReport(PublisherKit publisher, PublisherKit.PublisherRtcStats[] stats) {
+        String publisherId = Utils.getPublisherId(publisher);
+        if (publisherId.length() > 0) {
+            String event = publisherId + ":" + publisherPreface + "onRtcStatsReportUpdated";
+            sendEventMap(this.getReactApplicationContext(), event, EventUtils.preparePublisherRTCStatsReport(stats));
         }
     }
 
