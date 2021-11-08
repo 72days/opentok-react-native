@@ -36,6 +36,11 @@ export default class OTSubscriber extends Component {
       setNativeEvents(subscriberEvents);
     }
   }
+  getRtcStatsReport = () => {
+    this.state.streams.forEach(streamId => {
+      OT.getSubscriberRtcStatsReport(streamId)
+    })
+  }
   componentDidUpdate() {
     const { streamProperties } = this.props;
     if (!isEqual(this.state.streamProperties, streamProperties)) {

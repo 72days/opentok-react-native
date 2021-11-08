@@ -129,6 +129,12 @@ public final class EventUtils {
         return rtcStatsReportData;
     }
 
+    public static WritableMap prepareSubscriberRTCStatsReport(String jsonArrayOfReports) {
+        WritableMap rtcStatsReportData = Arguments.createMap();
+        rtcStatsReportData.putString("data", jsonArrayOfReports);
+        return rtcStatsReportData;
+    }
+
     public static WritableMap createError(String message) {
 
         WritableMap errorInfo = Arguments.createMap();

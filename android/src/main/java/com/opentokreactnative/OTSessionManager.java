@@ -57,7 +57,8 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         SubscriberKit.AudioStatsListener,
         SubscriberKit.VideoStatsListener,
         SubscriberKit.VideoListener,
-        SubscriberKit.StreamListener{
+        SubscriberKit.StreamListener,
+        SubscriberKit.SubscriberRtcStatsReportListener{
 
     private ConcurrentHashMap<String, Integer> connectionStatusMap = new ConcurrentHashMap<>();
     private ArrayList<String> jsEvents = new ArrayList<String>();
@@ -228,6 +229,7 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         mSubscriber.setVideoStatsListener(this);
         mSubscriber.setVideoListener(this);
         mSubscriber.setStreamListener(this);
+        mSubscriber.setRtcStatsReportListener(this);
         mSubscriber.setSubscribeToAudio(properties.getBoolean("subscribeToAudio"));
         mSubscriber.setSubscribeToVideo(properties.getBoolean("subscribeToVideo"));
         if (properties.hasKey("preferredFrameRate")) {
@@ -354,6 +356,15 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         Subscriber mSubscriber = mSubscribers.get(streamId);
         if (mSubscriber != null) {
             mSubscriber.setPreferredFrameRate(frameRate);
+        }
+    }
+
+    @ReactMethod
+    public void getSubscriberRtcStatsReport(String streamId) {
+        ConcurrentHashMap<String, Subscriber> mSubscribers = sharedState.getSubscribers();
+        Subscriber mSubscriber = mSubscribers.get(streamId);
+        if (mSubscriber != null) {
+            mSubscriber.getRtcStatsReport();
         }
     }
 
@@ -826,6 +837,21 @@ public class OTSessionManager extends ReactContextBaseJavaModule
             }
             subscriberInfo.putMap("videoStats", EventUtils.prepareVideoNetworkStats(stats));
             sendEventMap(this.getReactApplicationContext(), subscriberPreface + "onVideoStats", subscriberInfo);
+        }
+    }
+
+    @Override
+    public void onRtcStatsReport(SubscriberKit subscriber, String jsonArrayOfReports) {
+        String streamId = Utils.getStreamIdBySubscriber(subscriber);
+        if (streamId.length() > 0) {
+            ConcurrentHashMap<String, Stream> streams = sharedState.getSubscriberStreams();
+            Stream mStream = streams.get(streamId);
+            WritableMap subscriberInfo = Arguments.createMap();
+            if (mStream != null) {
+                subscriberInfo.putMap("stream", EventUtils.prepareJSStreamMap(mStream, subscriber.getSession()));
+            }
+            subscriberInfo.putMap("rtcStatsReport", EventUtils.prepareSubscriberRTCStatsReport(jsonArrayOfReports));
+            sendEventMap(this.getReactApplicationContext(), subscriberPreface + "onRtcStatsReportUpdated", subscriberInfo);
         }
     }
 

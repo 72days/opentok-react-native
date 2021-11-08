@@ -40,6 +40,7 @@ const sanitizeSubscriberEvents = (events) => {
       videoDisableWarning: 'onVideoDisableWarning',
       videoDisableWarningLifted: 'onVideoDisableWarningLifted',
       videoDataReceived: 'onVideoDataReceived',
+      rtcStatsReportUpdated: 'onRtcStatsReportUpdated',
     },
   };
   return reassignEvents('subscriber', customEvents, events);
