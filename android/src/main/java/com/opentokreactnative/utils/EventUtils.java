@@ -104,13 +104,33 @@ public final class EventUtils {
         return audioStats;
     }
 
-    public static WritableMap prepareVideoNetworkStats(SubscriberKit.SubscriberVideoStats stats) {
+    public static WritableMap prepareSubscriberVideoNetworkStats(SubscriberKit.SubscriberVideoStats stats) {
 
         WritableMap videoStats = Arguments.createMap();
         videoStats.putInt("videoPacketsLost", stats.videoPacketsLost);
         videoStats.putInt("videoBytesReceived", stats.videoBytesReceived);
         videoStats.putInt("videoPacketsReceived", stats.videoPacketsReceived);
         return videoStats;
+    }
+
+    public static WritableMap preparePublisherVideoNetworkStats(PublisherKit.PublisherVideoStats[] stats) {
+
+        WritableMap eventData = Arguments.createMap();
+        WritableArray jsStatsList = Arguments.createArray();
+
+        for (PublisherKit.PublisherVideoStats statsItem : stats) {
+            WritableMap jsDataItem = Arguments.createMap();
+            jsDataItem.putString("connectionId", statsItem.connectionId);
+            jsDataItem.putString("subscriberId", statsItem.subscriberId);
+            jsDataItem.putDouble("timestamp", statsItem.timeStamp);
+            jsDataItem.putDouble("videoPacketsLost", statsItem.videoPacketsLost);
+            jsDataItem.putDouble("videoPacketsSent", statsItem.videoPacketsSent);
+            jsDataItem.putDouble("videoBytesSent", statsItem.videoBytesSent);
+            jsStatsList.pushMap(jsDataItem);
+        }
+        
+        eventData.putArray("data", jsStatsList);
+        return eventData;
     }
 
     public static WritableMap preparePublisherRTCStatsReport(PublisherKit.PublisherRtcStats[] rtcStatsReport) {

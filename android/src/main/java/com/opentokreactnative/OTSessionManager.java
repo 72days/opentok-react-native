@@ -46,6 +46,7 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         implements Session.SessionListener,
         PublisherKit.PublisherListener,
         PublisherKit.AudioLevelListener,
+        PublisherKit.VideoStatsListener,
         PublisherKit.PublisherRtcStatsReportListener,
         SubscriberKit.SubscriberListener,
         Session.SignalListener,
@@ -185,6 +186,7 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         }
         mPublisher.setPublisherListener(this);
         mPublisher.setAudioLevelListener(this);
+        mPublisher.setVideoStatsListener(this);
         mPublisher.setRtcStatsReportListener(this);
         mPublisher.setAudioFallbackEnabled(audioFallbackEnabled);
         mPublisher.setPublishVideo(publishVideo);
@@ -719,6 +721,15 @@ public class OTSessionManager extends ReactContextBaseJavaModule
     }
 
     @Override
+    public void onVideoStats(PublisherKit publisher, PublisherKit.PublisherVideoStats[] stats) {
+        String publisherId = Utils.getPublisherId(publisher);
+        if (publisherId.length() > 0) {
+            String event = publisherId + ":" + publisherPreface + "onVideoStats";
+            sendEventMap(this.getReactApplicationContext(), event, EventUtils.preparePublisherVideoNetworkStats(stats));
+        }
+    }
+
+    @Override
     public void onRtcStatsReport(PublisherKit publisher, PublisherKit.PublisherRtcStats[] stats) {
         String publisherId = Utils.getPublisherId(publisher);
         if (publisherId.length() > 0) {
@@ -835,7 +846,7 @@ public class OTSessionManager extends ReactContextBaseJavaModule
             if (mStream != null) {
                 subscriberInfo.putMap("stream", EventUtils.prepareJSStreamMap(mStream, subscriber.getSession()));
             }
-            subscriberInfo.putMap("videoStats", EventUtils.prepareVideoNetworkStats(stats));
+            subscriberInfo.putMap("videoStats", EventUtils.prepareSubscriberVideoNetworkStats(stats));
             sendEventMap(this.getReactApplicationContext(), subscriberPreface + "onVideoStats", subscriberInfo);
         }
     }

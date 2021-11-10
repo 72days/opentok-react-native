@@ -82,6 +82,7 @@ const sanitizePublisherEvents = (publisherId, events) => {
       streamDestroyed: 'onStreamDestroyed',
       error: 'onError',
       audioLevel: 'onAudioLevelUpdated',
+      videoNetworkStats: 'onVideoStats',
       rtcStatsReportUpdated: 'onRtcStatsReportUpdated',
     },
   };

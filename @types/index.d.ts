@@ -323,7 +323,7 @@ declare module "opentok-react-native" {
     /** 
      * Sent periodically to report video statistics for the publisher. Returned as a list of 1 item in routed sessions, or many items in a relayed session.
      */
-     videoNetworkStats?: CallbackWithParam<{
+    videoNetworkStats?: CallbackWithParam<{
       data: any[]
     }>;
 
