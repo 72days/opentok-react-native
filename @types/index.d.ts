@@ -320,6 +320,13 @@ declare module "opentok-react-native" {
      */
     streamDestroyed?: CallbackWithParam<any, any>;
 
+    /** 
+     * Sent periodically to report video statistics for the publisher. Returned as a list of 1 item in routed sessions, or many items in a relayed session.
+     */
+     videoNetworkStats?: CallbackWithParam<{
+      data: any[]
+    }>;
+
     /**
      * Sent when the client calls publisher.getRtcStatsReport.
      */

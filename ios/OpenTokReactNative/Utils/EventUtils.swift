@@ -64,6 +64,23 @@ class EventUtils {
         return videoStatsEventData;
     }
     
+    static func preparePublisherVideoNetworkStatsEventData(_ videoStats: Array<OTPublisherKitVideoNetworkStats>) -> Dictionary<String, Any> {
+        var eventData: Dictionary<String, Any> = [:];
+        var stats = [Dictionary<String, Any>]()
+        for statsItem in videoStats {
+            var jsStatsItem: Dictionary<String, Any> = [:];
+            jsStatsItem["connectionId"] = statsItem.connectionId;
+            jsStatsItem["subscriberId"] = statsItem.subscriberId;
+            jsStatsItem["timestamp"] = statsItem.timestamp;
+            jsStatsItem["videoPacketsLost"] = statsItem.videoPacketsLost;
+            jsStatsItem["videoPacketsSent"] = statsItem.videoPacketsSent;
+            jsStatsItem["videoBytesSent"] = statsItem.videoBytesSent;
+            stats.append(jsStatsItem)
+        }
+        eventData["data"] = stats
+        return eventData;
+    }
+    
     static func prepareSubscriberAudioNetworkStatsEventData(_ audioStats: OTSubscriberKitAudioNetworkStats) -> Dictionary<String, Any> {
         var audioStatsEventData: Dictionary<String, Any> = [:];
         audioStatsEventData["audioPacketsLost"] = audioStats.audioPacketsLost;
@@ -119,6 +136,7 @@ class EventUtils {
             "\(publisherPreface)streamDestroyed",
             "\(publisherPreface)didFailWithError",
             "\(publisherPreface)audioLevelUpdated",
+            "\(publisherPreface)videoNetworkStatsUpdated",
             "\(publisherPreface)rtcStatsReportUpdated",
 
             "\(subscriberPreface)subscriberDidConnect",

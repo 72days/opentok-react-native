@@ -74,6 +74,7 @@ const sanitizePublisherEvents = (publisherId, events) => {
       streamDestroyed: 'streamDestroyed',
       error: 'didFailWithError',
       audioLevel: 'audioLevelUpdated',
+      videoNetworkStats: 'videoNetworkStatsUpdated',
       rtcStatsReportUpdated: 'rtcStatsReportUpdated',
     },
     android: {
