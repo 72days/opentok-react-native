@@ -149,6 +149,8 @@ class OTSessionManager: RCTEventEmitter {
             OTRN.sharedState.subscribers.updateValue(subscriber, forKey: streamId)
             subscriber.networkStatsDelegate = self;
             subscriber.audioLevelDelegate = self;
+            subscriber.rtcStatsReportDelegate = self;
+
             session.subscribe(subscriber, error: &error)
             subscriber.subscribeToAudio = Utils.sanitizeBooleanProperty(properties["subscribeToAudio"] as Any);
             subscriber.subscribeToVideo = Utils.sanitizeBooleanProperty(properties["subscribeToVideo"] as Any);
@@ -317,6 +319,11 @@ class OTSessionManager: RCTEventEmitter {
         publisher.getRtcStatsReport();
     }
 
+    @objc func getSubscriberRtcStatsReport(_ streamId: String) -> Void {
+        guard let subscriber = OTRN.sharedState.subscribers[streamId] else { return }
+        subscriber.getRtcStatsReport();
+    }
+    
     @objc func enableLogs(_ logLevel: Bool) -> Void {
         self.logLevel = logLevel;
     }
@@ -680,5 +687,18 @@ extension OTSessionManager: OTSubscriberKitAudioLevelDelegate {
         }
         subscriberInfo["stream"] = EventUtils.prepareJSStreamEventData(stream);
         self.emitEvent("\(EventUtils.subscriberPreface)audioLevelUpdated", data: subscriberInfo);
+    }
+}
+
+extension OTSessionManager: OTSubscriberKitRtcStatsReportDelegate {
+    func subscriber(_ subscriber: OTSubscriberKit, jsonArrayOfReports: String) {
+        var subscriberInfo: Dictionary<String, Any> = [:];
+        subscriberInfo["rtcStats"] = EventUtils.prepareJSSubscriberRTCStatsReport(jsonArrayOfReports);
+        guard let stream = subscriber.stream else {
+            self.emitEvent("\(EventUtils.subscriberPreface)rtcStatsReportUpdated", data: subscriberInfo);
+            return;
+        }
+        subscriberInfo["stream"] = EventUtils.prepareJSStreamEventData(stream);
+        self.emitEvent("\(EventUtils.subscriberPreface)rtcStatsReportUpdated", data: subscriberInfo);
     }
 }

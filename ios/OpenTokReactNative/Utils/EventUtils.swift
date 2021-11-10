@@ -93,6 +93,12 @@ class EventUtils {
         return rtcStatsReportData;
     }
     
+    static func prepareJSSubscriberRTCStatsReport(_ jsonArrayOfReports: String) -> Dictionary<String, Any> {
+        var rtcStatsReportData: Dictionary<String, Any> = [:];
+        rtcStatsReportData["data"] = jsonArrayOfReports
+        return rtcStatsReportData;
+    }
+    
     static func getSupportedEvents() -> [String] {
         return [
             "\(sessionPreface)streamCreated",
@@ -121,12 +127,14 @@ class EventUtils {
             "\(subscriberPreface)videoNetworkStatsUpdated",
             "\(subscriberPreface)audioNetworkStatsUpdated",
             "\(subscriberPreface)audioLevelUpdated",
+            "\(subscriberPreface)rtcStatsReportUpdated",
             "\(subscriberPreface)subscriberVideoEnabled",
             "\(subscriberPreface)subscriberVideoDisabled",
             "\(subscriberPreface)subscriberVideoDisableWarning",
             "\(subscriberPreface)subscriberVideoDisableWarningLifted",
             "\(subscriberPreface)subscriberVideoDataReceived",
-            "\(subscriberPreface)subscriberDidReconnect"];
+            "\(subscriberPreface)subscriberDidReconnect"
+        ];
     }
     
     static func convertDateToString(_ creationTime: Date) -> String {

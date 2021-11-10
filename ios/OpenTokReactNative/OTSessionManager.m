@@ -86,4 +86,7 @@ RCT_EXTERN_METHOD(enableLogs:
 RCT_EXTERN_METHOD(getPublisherRtcStatsReport:
                  (NSString*)publisherId)
 
+RCT_EXTERN_METHOD(getSubscriberRtcStatsReport:
+                 (NSString*)streamId)
+
 @end
