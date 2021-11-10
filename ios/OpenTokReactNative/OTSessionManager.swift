@@ -551,6 +551,14 @@ extension OTSessionManager: OTPublisherKitNetworkStatsDelegate {
             self.emitEvent("\(publisherId):\(EventUtils.publisherPreface)videoNetworkStatsUpdated", data: videoStats);
         }
     }
+
+    func publisher(_ publisher: OTPublisherKit, audioNetworkStatsUpdated stats: Array<OTPublisherKitAudioNetworkStats>) {
+        let publisherId = Utils.getPublisherId(publisher as! OTPublisher);
+        if (publisherId.count > 0) {
+            let audioStats: Dictionary<String, Any> = EventUtils.preparePublisherAudioNetworkStatsEventData(stats);
+            self.emitEvent("\(publisherId):\(EventUtils.publisherPreface)audioNetworkStatsUpdated", data: audioStats);
+        }
+    }
 }
 
 extension OTSessionManager: OTPublisherKitRtcStatsReportDelegate {

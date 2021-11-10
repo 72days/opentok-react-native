@@ -75,6 +75,7 @@ const sanitizePublisherEvents = (publisherId, events) => {
       error: 'didFailWithError',
       audioLevel: 'audioLevelUpdated',
       videoNetworkStats: 'videoNetworkStatsUpdated',
+      audioNetworkStats: 'audioNetworkStatsUpdated',
       rtcStatsReportUpdated: 'rtcStatsReportUpdated',
     },
     android: {
@@ -83,6 +84,7 @@ const sanitizePublisherEvents = (publisherId, events) => {
       error: 'onError',
       audioLevel: 'onAudioLevelUpdated',
       videoNetworkStats: 'onVideoStats',
+      audioNetworkStats: 'onAudioStats',
       rtcStatsReportUpdated: 'onRtcStatsReportUpdated',
     },
   };

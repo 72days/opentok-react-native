@@ -88,6 +88,23 @@ class EventUtils {
         audioStatsEventData["audioPacketsReceived"] = audioStats.audioPacketsReceived;
         return audioStatsEventData;
     }
+
+    static func preparePublisherAudioNetworkStatsEventData(_ audioStats: Array<OTPublisherKitAudioNetworkStats>) -> Dictionary<String, Any> {
+        var eventData: Dictionary<String, Any> = [:];
+        var stats = [Dictionary<String, Any>]()
+        for statsItem in audioStats {
+            var jsStatsItem: Dictionary<String, Any> = [:];
+            jsStatsItem["connectionId"] = statsItem.connectionId;
+            jsStatsItem["subscriberId"] = statsItem.subscriberId;
+            jsStatsItem["timestamp"] = statsItem.timestamp;
+            jsStatsItem["audioPacketsLost"] = statsItem.audioPacketsLost;
+            jsStatsItem["audioBytesSent"] = statsItem.audioBytesSent;
+            jsStatsItem["audioPacketsSent"] = statsItem.audioPacketsSent;
+            stats.append(jsStatsItem)
+        }
+        eventData["data"] = stats
+        return eventData;
+    }
     
     static func prepareJSSessionEventData(_ session: OTSession) -> Dictionary<String, Any> {
         var sessionInfo: Dictionary<String, Any> = [:];
@@ -135,8 +152,9 @@ class EventUtils {
             "\(publisherPreface)streamCreated",
             "\(publisherPreface)streamDestroyed",
             "\(publisherPreface)didFailWithError",
-            "\(publisherPreface)audioLevelUpdated",
             "\(publisherPreface)videoNetworkStatsUpdated",
+            "\(publisherPreface)audioNetworkStatsUpdated",
+            "\(publisherPreface)audioLevelUpdated",
             "\(publisherPreface)rtcStatsReportUpdated",
 
             "\(subscriberPreface)subscriberDidConnect",

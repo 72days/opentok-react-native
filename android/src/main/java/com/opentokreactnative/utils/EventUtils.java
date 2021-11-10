@@ -95,13 +95,33 @@ public final class EventUtils {
         return streamPropertyEventData;
     }
 
-    public static WritableMap prepareAudioNetworkStats(SubscriberKit.SubscriberAudioStats stats) {
+    public static WritableMap prepareSubscriberAudioNetworkStats(SubscriberKit.SubscriberAudioStats stats) {
 
         WritableMap audioStats = Arguments.createMap();
         audioStats.putInt("audioPacketsLost", stats.audioPacketsLost);
         audioStats.putInt("audioBytesReceived", stats.audioBytesReceived);
         audioStats.putInt("audioPacketsReceived", stats.audioPacketsReceived);
         return audioStats;
+    }
+
+    public static WritableMap preparePublisherAudioNetworkStats(PublisherKit.PublisherAudioStats[] stats) {
+
+        WritableMap eventData = Arguments.createMap();
+        WritableArray jsStatsList = Arguments.createArray();
+
+        for (PublisherKit.PublisherAudioStats statsItem : stats) {
+            WritableMap jsDataItem = Arguments.createMap();
+            jsDataItem.putString("connectionId", statsItem.connectionId);
+            jsDataItem.putString("subscriberId", statsItem.subscriberId);
+            jsDataItem.putDouble("timestamp", statsItem.timeStamp);
+            jsDataItem.putDouble("audioPacketsLost", statsItem.audioPacketsLost);
+            jsDataItem.putDouble("audioBytesSent", statsItem.audioBytesSent);
+            jsDataItem.putDouble("audioPacketsSent", statsItem.audioPacketsSent);
+            jsStatsList.pushMap(jsDataItem);
+        }
+        
+        eventData.putArray("data", jsStatsList);
+        return eventData;
     }
 
     public static WritableMap prepareSubscriberVideoNetworkStats(SubscriberKit.SubscriberVideoStats stats) {

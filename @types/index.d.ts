@@ -327,6 +327,13 @@ declare module "opentok-react-native" {
       data: any[]
     }>;
 
+    /** 
+     * Sent periodically to report audio statistics for the publisher. Returned as a list of 1 item in routed sessions, or many items in a relayed session.
+     */
+    audioNetworkStats?: CallbackWithParam<{
+      data: any[]
+    }>;
+
     /**
      * Sent when the client calls publisher.getRtcStatsReport.
      */

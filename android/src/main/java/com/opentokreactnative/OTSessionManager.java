@@ -46,6 +46,7 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         implements Session.SessionListener,
         PublisherKit.PublisherListener,
         PublisherKit.AudioLevelListener,
+        PublisherKit.AudioStatsListener,
         PublisherKit.VideoStatsListener,
         PublisherKit.PublisherRtcStatsReportListener,
         SubscriberKit.SubscriberListener,
@@ -186,6 +187,7 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         }
         mPublisher.setPublisherListener(this);
         mPublisher.setAudioLevelListener(this);
+        mPublisher.setAudioStatsListener(this);
         mPublisher.setVideoStatsListener(this);
         mPublisher.setRtcStatsReportListener(this);
         mPublisher.setAudioFallbackEnabled(audioFallbackEnabled);
@@ -730,6 +732,15 @@ public class OTSessionManager extends ReactContextBaseJavaModule
     }
 
     @Override
+    public void onAudioStats(PublisherKit publisher, PublisherKit.PublisherAudioStats[] stats) {
+        String publisherId = Utils.getPublisherId(publisher);
+        if (publisherId.length() > 0) {
+            String event = publisherId + ":" + publisherPreface + "onAudioStats";
+            sendEventMap(this.getReactApplicationContext(), event, EventUtils.preparePublisherAudioNetworkStats(stats));
+        }
+    }
+
+    @Override
     public void onRtcStatsReport(PublisherKit publisher, PublisherKit.PublisherRtcStats[] stats) {
         String publisherId = Utils.getPublisherId(publisher);
         if (publisherId.length() > 0) {
@@ -830,7 +841,7 @@ public class OTSessionManager extends ReactContextBaseJavaModule
             if (mStream != null) {
                 subscriberInfo.putMap("stream", EventUtils.prepareJSStreamMap(mStream, subscriber.getSession()));
             }
-            subscriberInfo.putMap("audioStats", EventUtils.prepareAudioNetworkStats(stats));
+            subscriberInfo.putMap("audioStats", EventUtils.prepareSubscriberAudioNetworkStats(stats));
             sendEventMap(this.getReactApplicationContext(), subscriberPreface +  "onAudioStats", subscriberInfo);
         }
     }
