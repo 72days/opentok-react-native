@@ -129,7 +129,7 @@ class EventUtils {
     
     static func prepareJSSubscriberRTCStatsReport(_ jsonArrayOfReports: String) -> Dictionary<String, Any> {
         var rtcStatsReportData: Dictionary<String, Any> = [:];
-        rtcStatsReportData["data"] = jsonArrayOfReports
+        rtcStatsReportData["jsonArrayOfReports"] = jsonArrayOfReports
         return rtcStatsReportData;
     }
     

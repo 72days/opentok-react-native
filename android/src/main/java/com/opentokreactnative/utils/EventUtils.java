@@ -171,7 +171,7 @@ public final class EventUtils {
 
     public static WritableMap prepareSubscriberRTCStatsReport(String jsonArrayOfReports) {
         WritableMap rtcStatsReportData = Arguments.createMap();
-        rtcStatsReportData.putString("data", jsonArrayOfReports);
+        rtcStatsReportData.putString("jsonArrayOfReports", jsonArrayOfReports);
         return rtcStatsReportData;
     }
 

@@ -716,9 +716,9 @@ extension OTSessionManager: OTSubscriberKitAudioLevelDelegate {
 }
 
 extension OTSessionManager: OTSubscriberKitRtcStatsReportDelegate {
-    func subscriber(_ subscriber: OTSubscriberKit, jsonArrayOfReports: String) {
+    func subscriber(_ subscriber: OTSubscriberKit, rtcStatsReport jsonArrayOfReports: String) {
         var subscriberInfo: Dictionary<String, Any> = [:];
-        subscriberInfo["rtcStats"] = EventUtils.prepareJSSubscriberRTCStatsReport(jsonArrayOfReports);
+        subscriberInfo["rtcStatsReport"] = EventUtils.prepareJSSubscriberRTCStatsReport(jsonArrayOfReports);
         guard let stream = subscriber.stream else {
             self.emitEvent("\(EventUtils.subscriberPreface)rtcStatsReportUpdated", data: subscriberInfo);
             return;
