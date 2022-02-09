@@ -319,12 +319,33 @@ declare module "opentok-react-native" {
      * Sent when the publisher stops streaming.
      */
     streamDestroyed?: CallbackWithParam<any, any>;
+
+    /** 
+     * Sent periodically to report video statistics for the publisher. Returned as a list of 1 item in routed sessions, or many items in a relayed session.
+     */
+    videoNetworkStats?: CallbackWithParam<{
+      data: any[]
+    }>;
+
+    /** 
+     * Sent periodically to report audio statistics for the publisher. Returned as a list of 1 item in routed sessions, or many items in a relayed session.
+     */
+    audioNetworkStats?: CallbackWithParam<{
+      data: any[]
+    }>;
+
+    /**
+     * Sent when the client calls publisher.getRtcStatsReport.
+     */
+    rtcStatsReportUpdated?: CallbackWithParam<any>;
   }
 
   /**
    * https://github.com/opentok/opentok-react-native/blob/master/docs/OTPublisher.md
    */
-  export class OTPublisher extends React.Component<OTPublisherProps> {}
+  export class OTPublisher extends React.Component<OTPublisherProps> {
+    getRtcStatsReport: () => void
+  }
 
   interface OTSubscriberProps extends ViewProps {
     /**
@@ -430,6 +451,11 @@ declare module "opentok-react-native" {
      * Sent periodically to report video statistics for the subscriber.
      */
     videoNetworkStats?: CallbackWithParam<any, any>;
+
+    /**
+     * Sent when the client calls subscriber.getRtcStatsReport.
+     */
+    rtcStatsReportUpdated?: CallbackWithParam<any>;
   }
 
   interface OTSubscriberViewProps extends ViewProps {
@@ -446,5 +472,7 @@ declare module "opentok-react-native" {
   /**
    * https://github.com/opentok/opentok-react-native/blob/master/docs/OTSubscriber.md
    */
-  export class OTSubscriber extends React.Component<OTSubscriberProps> {}
+  export class OTSubscriber extends React.Component<OTSubscriberProps> {
+    getRtcStatsReport: () => void
+  }
 }

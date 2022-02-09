@@ -46,6 +46,9 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         implements Session.SessionListener,
         PublisherKit.PublisherListener,
         PublisherKit.AudioLevelListener,
+        PublisherKit.AudioStatsListener,
+        PublisherKit.VideoStatsListener,
+        PublisherKit.PublisherRtcStatsReportListener,
         SubscriberKit.SubscriberListener,
         Session.SignalListener,
         Session.ConnectionListener,
@@ -56,7 +59,8 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         SubscriberKit.AudioStatsListener,
         SubscriberKit.VideoStatsListener,
         SubscriberKit.VideoListener,
-        SubscriberKit.StreamListener{
+        SubscriberKit.StreamListener,
+        SubscriberKit.SubscriberRtcStatsReportListener{
 
     private ConcurrentHashMap<String, Integer> connectionStatusMap = new ConcurrentHashMap<>();
     private ArrayList<String> jsEvents = new ArrayList<String>();
@@ -183,6 +187,9 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         }
         mPublisher.setPublisherListener(this);
         mPublisher.setAudioLevelListener(this);
+        mPublisher.setAudioStatsListener(this);
+        mPublisher.setVideoStatsListener(this);
+        mPublisher.setRtcStatsReportListener(this);
         mPublisher.setAudioFallbackEnabled(audioFallbackEnabled);
         mPublisher.setPublishVideo(publishVideo);
         mPublisher.setPublishAudio(publishAudio);
@@ -226,6 +233,7 @@ public class OTSessionManager extends ReactContextBaseJavaModule
         mSubscriber.setVideoStatsListener(this);
         mSubscriber.setVideoListener(this);
         mSubscriber.setStreamListener(this);
+        mSubscriber.setRtcStatsReportListener(this);
         mSubscriber.setSubscribeToAudio(properties.getBoolean("subscribeToAudio"));
         mSubscriber.setSubscribeToVideo(properties.getBoolean("subscribeToVideo"));
         if (properties.hasKey("preferredFrameRate")) {
@@ -356,12 +364,30 @@ public class OTSessionManager extends ReactContextBaseJavaModule
     }
 
     @ReactMethod
+    public void getSubscriberRtcStatsReport(String streamId) {
+        ConcurrentHashMap<String, Subscriber> mSubscribers = sharedState.getSubscribers();
+        Subscriber mSubscriber = mSubscribers.get(streamId);
+        if (mSubscriber != null) {
+            mSubscriber.getRtcStatsReport();
+        }
+    }
+
+    @ReactMethod
     public void changeCameraPosition(String publisherId, String cameraPosition) {
 
         ConcurrentHashMap<String, Publisher> mPublishers = sharedState.getPublishers();
         Publisher mPublisher = mPublishers.get(publisherId);
         if (mPublisher != null) {
             mPublisher.cycleCamera();
+        }
+    }
+
+    @ReactMethod
+    public void getPublisherRtcStatsReport(String publisherId) {
+        ConcurrentHashMap<String, Publisher> mPublishers = sharedState.getPublishers();
+        Publisher mPublisher = mPublishers.get(publisherId);
+        if (mPublisher != null) {
+            mPublisher.getRtcStatsReport();
         }
     }
 
@@ -697,6 +723,33 @@ public class OTSessionManager extends ReactContextBaseJavaModule
     }
 
     @Override
+    public void onVideoStats(PublisherKit publisher, PublisherKit.PublisherVideoStats[] stats) {
+        String publisherId = Utils.getPublisherId(publisher);
+        if (publisherId.length() > 0) {
+            String event = publisherId + ":" + publisherPreface + "onVideoStats";
+            sendEventMap(this.getReactApplicationContext(), event, EventUtils.preparePublisherVideoNetworkStats(stats));
+        }
+    }
+
+    @Override
+    public void onAudioStats(PublisherKit publisher, PublisherKit.PublisherAudioStats[] stats) {
+        String publisherId = Utils.getPublisherId(publisher);
+        if (publisherId.length() > 0) {
+            String event = publisherId + ":" + publisherPreface + "onAudioStats";
+            sendEventMap(this.getReactApplicationContext(), event, EventUtils.preparePublisherAudioNetworkStats(stats));
+        }
+    }
+
+    @Override
+    public void onRtcStatsReport(PublisherKit publisher, PublisherKit.PublisherRtcStats[] stats) {
+        String publisherId = Utils.getPublisherId(publisher);
+        if (publisherId.length() > 0) {
+            String event = publisherId + ":" + publisherPreface + "onRtcStatsReportUpdated";
+            sendEventMap(this.getReactApplicationContext(), event, EventUtils.preparePublisherRTCStatsReport(stats));
+        }
+    }
+
+    @Override
     public void onConnected(SubscriberKit subscriberKit) {
 
         String streamId = Utils.getStreamIdBySubscriber(subscriberKit);
@@ -788,7 +841,7 @@ public class OTSessionManager extends ReactContextBaseJavaModule
             if (mStream != null) {
                 subscriberInfo.putMap("stream", EventUtils.prepareJSStreamMap(mStream, subscriber.getSession()));
             }
-            subscriberInfo.putMap("audioStats", EventUtils.prepareAudioNetworkStats(stats));
+            subscriberInfo.putMap("audioStats", EventUtils.prepareSubscriberAudioNetworkStats(stats));
             sendEventMap(this.getReactApplicationContext(), subscriberPreface +  "onAudioStats", subscriberInfo);
         }
     }
@@ -804,8 +857,23 @@ public class OTSessionManager extends ReactContextBaseJavaModule
             if (mStream != null) {
                 subscriberInfo.putMap("stream", EventUtils.prepareJSStreamMap(mStream, subscriber.getSession()));
             }
-            subscriberInfo.putMap("videoStats", EventUtils.prepareVideoNetworkStats(stats));
+            subscriberInfo.putMap("videoStats", EventUtils.prepareSubscriberVideoNetworkStats(stats));
             sendEventMap(this.getReactApplicationContext(), subscriberPreface + "onVideoStats", subscriberInfo);
+        }
+    }
+
+    @Override
+    public void onRtcStatsReport(SubscriberKit subscriber, String jsonArrayOfReports) {
+        String streamId = Utils.getStreamIdBySubscriber(subscriber);
+        if (streamId.length() > 0) {
+            ConcurrentHashMap<String, Stream> streams = sharedState.getSubscriberStreams();
+            Stream mStream = streams.get(streamId);
+            WritableMap subscriberInfo = Arguments.createMap();
+            if (mStream != null) {
+                subscriberInfo.putMap("stream", EventUtils.prepareJSStreamMap(mStream, subscriber.getSession()));
+            }
+            subscriberInfo.putMap("rtcStatsReport", EventUtils.prepareSubscriberRTCStatsReport(jsonArrayOfReports));
+            sendEventMap(this.getReactApplicationContext(), subscriberPreface + "onRtcStatsReportUpdated", subscriberInfo);
         }
     }
 

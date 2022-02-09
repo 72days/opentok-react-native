@@ -2,11 +2,13 @@ package com.opentokreactnative.utils;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableArray;
 import com.opentok.android.Connection;
 import com.opentok.android.OpentokError;
 import com.opentok.android.Session;
 import com.opentok.android.Stream;
 import com.opentok.android.SubscriberKit;
+import com.opentok.android.PublisherKit;
 
 public final class EventUtils {
 
@@ -93,7 +95,7 @@ public final class EventUtils {
         return streamPropertyEventData;
     }
 
-    public static WritableMap prepareAudioNetworkStats(SubscriberKit.SubscriberAudioStats stats) {
+    public static WritableMap prepareSubscriberAudioNetworkStats(SubscriberKit.SubscriberAudioStats stats) {
 
         WritableMap audioStats = Arguments.createMap();
         audioStats.putInt("audioPacketsLost", stats.audioPacketsLost);
@@ -102,13 +104,75 @@ public final class EventUtils {
         return audioStats;
     }
 
-    public static WritableMap prepareVideoNetworkStats(SubscriberKit.SubscriberVideoStats stats) {
+    public static WritableMap preparePublisherAudioNetworkStats(PublisherKit.PublisherAudioStats[] stats) {
+
+        WritableMap eventData = Arguments.createMap();
+        WritableArray jsStatsList = Arguments.createArray();
+
+        for (PublisherKit.PublisherAudioStats statsItem : stats) {
+            WritableMap jsDataItem = Arguments.createMap();
+            jsDataItem.putString("connectionId", statsItem.connectionId);
+            jsDataItem.putString("subscriberId", statsItem.subscriberId);
+            jsDataItem.putDouble("timestamp", statsItem.timeStamp);
+            jsDataItem.putDouble("audioPacketsLost", statsItem.audioPacketsLost);
+            jsDataItem.putDouble("audioBytesSent", statsItem.audioBytesSent);
+            jsDataItem.putDouble("audioPacketsSent", statsItem.audioPacketsSent);
+            jsStatsList.pushMap(jsDataItem);
+        }
+        
+        eventData.putArray("data", jsStatsList);
+        return eventData;
+    }
+
+    public static WritableMap prepareSubscriberVideoNetworkStats(SubscriberKit.SubscriberVideoStats stats) {
 
         WritableMap videoStats = Arguments.createMap();
         videoStats.putInt("videoPacketsLost", stats.videoPacketsLost);
         videoStats.putInt("videoBytesReceived", stats.videoBytesReceived);
         videoStats.putInt("videoPacketsReceived", stats.videoPacketsReceived);
         return videoStats;
+    }
+
+    public static WritableMap preparePublisherVideoNetworkStats(PublisherKit.PublisherVideoStats[] stats) {
+
+        WritableMap eventData = Arguments.createMap();
+        WritableArray jsStatsList = Arguments.createArray();
+
+        for (PublisherKit.PublisherVideoStats statsItem : stats) {
+            WritableMap jsDataItem = Arguments.createMap();
+            jsDataItem.putString("connectionId", statsItem.connectionId);
+            jsDataItem.putString("subscriberId", statsItem.subscriberId);
+            jsDataItem.putDouble("timestamp", statsItem.timeStamp);
+            jsDataItem.putDouble("videoPacketsLost", statsItem.videoPacketsLost);
+            jsDataItem.putDouble("videoPacketsSent", statsItem.videoPacketsSent);
+            jsDataItem.putDouble("videoBytesSent", statsItem.videoBytesSent);
+            jsStatsList.pushMap(jsDataItem);
+        }
+        
+        eventData.putArray("data", jsStatsList);
+        return eventData;
+    }
+
+    public static WritableMap preparePublisherRTCStatsReport(PublisherKit.PublisherRtcStats[] rtcStatsReport) {
+
+        WritableMap rtcStatsReportData = Arguments.createMap();
+        WritableArray reports = Arguments.createArray();
+
+        for (PublisherKit.PublisherRtcStats rtcStatsReportItem : rtcStatsReport) {
+            WritableMap jsDataItem = Arguments.createMap();
+            jsDataItem.putString("connectionId", rtcStatsReportItem.connectionId);
+            jsDataItem.putString("jsonArrayOfReports", rtcStatsReportItem.jsonArrayOfReports);
+            reports.pushMap(jsDataItem);
+        }
+        
+        rtcStatsReportData.putArray("data", reports);
+        return rtcStatsReportData;
+    }
+
+    public static WritableMap prepareSubscriberRTCStatsReport(String jsonArrayOfReports) {
+        WritableMap rtcStatsReportData = Arguments.createMap();
+        rtcStatsReportData.putString("jsonArrayOfReports", jsonArrayOfReports);
+        return rtcStatsReportData;
     }
 
     public static WritableMap createError(String message) {
